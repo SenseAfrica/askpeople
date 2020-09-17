@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><html><body>All is set!<br/>You are now a member of AskPeople.<br/><a href="forget.php" accesskey="99">home</a><br/><a href="info.php" accesskey="9">more info</a><br/></body></html>
