@@ -8,7 +8,9 @@ PHP and MySQL
 
 ## how-to
 1 - Copy all files to the root folder
+
 2 - Deploy askpeople.sql to MysQL server
+
 3 - Modify the corresponding database details in db_params.php
 
 ## next TODO
