@@ -5,6 +5,7 @@ function good_num($number){
 	return ((substr($number,0,1)=='+')&&(((int)substr($number,1))>0));
 }
 function sms($org,$phone,$msg,$dr=0,$todo=false){
+	global $db_conn;
 	file_put_contents('debug.txt',json_encode(array($org,$phone,$msg,$dr,$todo)));
 	global $token;
 	if (is_string($phone)) $phone=(int)preg_replace("/[^0-9]/", '', $phone);

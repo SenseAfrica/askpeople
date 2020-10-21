@@ -1,5 +1,6 @@
 <?php
 function show_node($node,$last=false){
+global $db_conn;
 //This function ensures that this node can be seen by uses through profiling
 	if((!$last)||($last['id']==$node)){
 		$res=mysqli_query($db_conn,"SELECT * FROM nodes_{$_SESSION['user']['org']} WHERE id = $node");
