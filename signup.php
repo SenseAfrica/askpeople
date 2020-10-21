@@ -102,7 +102,7 @@ CREATE VIEW form_view_{$id} AS SELECT active, created, forms_{$id}.id, forms_{$i
 					$success="Organization account successfully created";
 					include_once('mail.php');
 					HW_send($_POST['email'],'Welcome to AskPeople',"<b>An account has been created on the AskPeople platform for {$_POST['orgname']}.</b><br/><p>You have also received 5000 credits to test the system.</p>");
-					include_once('challenge/utils.php');
+					include_once('challenge_deprecated/utils.php');
 					register_shutdown_function('sms',0,$_POST['phone'],'Welcome to AskPeople');
 					$_POST=array();
 					include ('index.php');

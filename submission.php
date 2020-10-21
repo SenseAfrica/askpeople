@@ -36,7 +36,7 @@ function submit_survey($visitor,$obj,$org,$form,$form_title='',$admin_mail=false
 				$line3=mysqli_fetch_assoc($res);
 				$line2['phone']=$line3['phone'];
 			}
-			include_once('challenge/utils.php');
+			include_once('challenge_deprecated/utils.php');
 			sms($org,$line2['phone'],'Alert on '.$count.' sumbissions. Form "'.$line2['name'].'"');
 		}
 		if(($line2['deactivator'])&&($count>=$line2['deactivator'])){

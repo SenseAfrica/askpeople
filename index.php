@@ -15,7 +15,7 @@ if (isset($_POST['email'])){
 	//echo $qry;
 	if ($res){
 		if (mysqli_num_rows($res)){
-			$_SESSION['user']=mysqli_fetch_array($res, mysqli_ASSOC);
+			$_SESSION['user']=mysqli_fetch_array($res, MYSQLI_ASSOC);
 			mysqli_query($db_conn,'UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE uid = '.$_SESSION['user']['uid']);
 		}
 		else $alert="Incorrect E-mail/Password Combination";
@@ -36,7 +36,7 @@ if (isset($_SESSION['user'])){
 		} else $alert="Please Re-enter the New Password.";
 	}
 	if (isset($_POST['bill_phone'])){
-		include_once('challenge/utils.php');
+		include_once('challenge_deprecated/utils.php');
 		$amt=(int)$_POST['bill_amount'];
 		if(charge($_POST['bill_phone'],$amt)){
 			$res=mysqli_query($db_conn,"UPDATE end_users SET credits=credits+$amt WHERE id=".$_SESSION['user']['org']);

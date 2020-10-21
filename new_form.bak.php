@@ -2,7 +2,7 @@
 @session_start();
 set_time_limit(0);
 include_once ('db.php');
-include_once ('challenge/utils.php');
+include_once ('challenge_deprecated/utils.php');
 //bug solution
 if (isset($_GET['node'])){
 	$n=end($_SESSION['temp_path']);
