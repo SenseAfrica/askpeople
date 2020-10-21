@@ -11,12 +11,12 @@ if (isset($_GET['alert'])) $alert=urldecode($_GET['alert']);
 
 
 if (isset($_POST['email'])){
-	$res=mysql_query($qry='SELECT * FROM `users` LEFT JOIN `end_users` ON org = id WHERE email = "'.mysql_real_escape_string($_POST['email']).'" AND password = "'.md5($_POST['password'].'no-paps').'" LIMIT 0,1');
+	$res=mysqli_query($qry='SELECT * FROM `users` LEFT JOIN `end_users` ON org = id WHERE email = "'.mysqli_real_escape_string($_POST['email']).'" AND password = "'.md5($_POST['password'].'no-paps').'" LIMIT 0,1');
 	//echo $qry;
 	if ($res){
-		if (mysql_num_rows($res)){
-			$_SESSION['user']=mysql_fetch_array($res, MYSQL_ASSOC);
-			mysql_query ('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE uid = '.$_SESSION['user']['uid']);
+		if (mysqli_num_rows($res)){
+			$_SESSION['user']=mysqli_fetch_array($res, mysqli_ASSOC);
+			mysqli_query ('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE uid = '.$_SESSION['user']['uid']);
 		}
 		else $alert="Incorrect E-mail/Password Combination";
 	} else $alert="Database Error 3. Please Try Again Later.";
@@ -26,8 +26,8 @@ if (isset($_SESSION['user'])){
 	if (isset($_POST['new_pwd'])){
 		if ($_POST['new_pwd']==$_POST['new_pwd_2']){
 			if(md5($_POST['old_pwd'].'no-paps')==$_SESSION['user']['password']){
-				$res=mysql_query ('UPDATE users SET password = "'.md5($_POST['new_pwd'].'no-paps').'" WHERE uid = '.$_SESSION['user']['uid']);
-				if (($res)&&(mysql_affected_rows())){
+				$res=mysqli_query ('UPDATE users SET password = "'.md5($_POST['new_pwd'].'no-paps').'" WHERE uid = '.$_SESSION['user']['uid']);
+				if (($res)&&(mysqli_affected_rows())){
 					$_SESSION['user']['password']=md5($_POST['new_pwd'].'no-paps');
 					$success="Password Successfuly Updated";
 				}
@@ -39,7 +39,7 @@ if (isset($_SESSION['user'])){
 		include_once('challenge/utils.php');
 		$amt=(int)$_POST['bill_amount'];
 		if(charge($_POST['bill_phone'],$amt)){
-			$res=mysql_query("UPDATE end_users SET credits=credits+$amt WHERE id=".$_SESSION['user']['org']);
+			$res=mysqli_query("UPDATE end_users SET credits=credits+$amt WHERE id=".$_SESSION['user']['org']);
 			if($res) $success="You have recharged your accound with $amt XOF";
 		}else $error="Please check your number, and your balance.";
 	}

@@ -11,12 +11,12 @@ function sms($org,$phone,$msg,$dr=0,$todo=false){
 	global $token;
 	include_once('../db.php');
 	if($dr){
-		mysql_query("INSERT INTO pendingsms (org,phone,msg".(($todo)?',todo':'').") VALUES ($org,$phone,'".mysql_real_escape_string($msg)."'".(($todo)?(",'".mysql_real_escape_string($todo)."'"):'').")");
-		$dr=mysql_insert_id();
+		mysqli_query("INSERT INTO pendingsms (org,phone,msg".(($todo)?',todo':'').") VALUES ($org,$phone,'".mysqli_real_escape_string($msg)."'".(($todo)?(",'".mysqli_real_escape_string($todo)."'"):'').")");
+		$dr=mysqli_insert_id();
 	}
 	//$org=0 means SEND FOR FREE
-	if ($org) mysql_query("UPDATE end_users SET credits = credits - 10 WHERE id=$org AND (credits-reserve)>9");
-	if ((!$org)||(mysql_affected_rows())){
+	if ($org) mysqli_query("UPDATE end_users SET credits = credits - 10 WHERE id=$org AND (credits-reserve)>9");
+	if ((!$org)||(mysqli_affected_rows())){
 		$res = sendSMS($phone, $msg, 'AskPeople', $dr, $token);
 		return (floor((int)$res[0]/100)==2);	
 	}

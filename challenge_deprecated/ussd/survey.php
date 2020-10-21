@@ -5,8 +5,8 @@ include('head.php');
 echo '<html>';
 echo '<body>';
 
-$res=mysql_query("SELECT id,org,form,step FROM visitors WHERE phone = $msisdn");
-$line=mysql_fetch_assoc($res);
+$res=mysqli_query("SELECT id,org,form,step FROM visitors WHERE phone = $msisdn");
+$line=mysqli_fetch_assoc($res);
 if ($line['form']==0){
 	include('../../account_options.php');
 	$questions=array(
@@ -67,8 +67,8 @@ if ($line['form']==0){
 		$obj[$key]= $val;
 		file_put_contents('tmp/'.$line['id'],json_encode($obj));
 	}
-	$res=mysql_query("SELECT fieldset,name,mail FROM forms_{$line['org']} WHERE id = {$line['form']}");
-	$line2=mysql_fetch_assoc($res);
+	$res=mysqli_query("SELECT fieldset,name,mail FROM forms_{$line['org']} WHERE id = {$line['form']}");
+	$line2=mysqli_fetch_assoc($res);
 	$questions=explode('</li><li',$line2['fieldset']);
 	$admin=array($line2['name'],$line2['mail']);
 	$curr_q=clean_q($questions[$line['step']]);	
@@ -90,7 +90,7 @@ if (isset($_GET["response"])) {
 	}
 	if (isset($val)){
 		if($line['form']==0) {
-			mysql_query("UPDATE visitors SET {$curr_q['column']} = $val, step = step +1 WHERE id = {$line['id']}");
+			mysqli_query("UPDATE visitors SET {$curr_q['column']} = $val, step = step +1 WHERE id = {$line['id']}");
 			if($line['step']==4) {
 				$curr_q=false;
 				echo 'All is set!<br/>';
@@ -107,21 +107,21 @@ if (isset($_GET["response"])) {
 				unlink('tmp/'.$line['id']);
 				$num=count($obj);
 				$needed=10*$num;
-				mysql_query("DELETE FROM reservations WHERE org={$line['org']} AND form={$line['form']} AND visitor={$line['id']}");
-				if(mysql_affected_rows()) mysql_query("UPDATE end_users SET reserve = reserve-$needed, credits=credits-$needed WHERE id={$line['org']} AND credits>=$needed");
+				mysqli_query("DELETE FROM reservations WHERE org={$line['org']} AND form={$line['form']} AND visitor={$line['id']}");
+				if(mysqli_affected_rows()) mysqli_query("UPDATE end_users SET reserve = reserve-$needed, credits=credits-$needed WHERE id={$line['org']} AND credits>=$needed");
 				file_put_contents('debug.txt',"UPDATE end_users SET reserve = reserve-$needed, credits=credits-$needed WHERE id={$line['org']} AND credits>=$needed");
 				
 				include_once('../../submission.php');
 				if(isset($admin)) submit_survey($line['id'],$obj,$line['org'],$line['form'],$admin[0],$admin[1]);
 				else submit_survey($line['id'],$obj,$line['org'],$line['form']);
 					
-				if(mysql_affected_rows()) {
-					mysql_query("UPDATE visitors SET org = 0, form = 0, step = 5, credits = credits + ($num*5) WHERE id = {$line['id']}");
+				if(mysqli_affected_rows()) {
+					mysqli_query("UPDATE visitors SET org = 0, form = 0, step = 5, credits = credits + ($num*5) WHERE id = {$line['id']}");
 					//include_once('../../submission.php');
 					//if(isset($admin)) submit_survey($line['id'],$obj,$line['org'],$line['form'],$admin[0],$admin[1]);
 					//else submit_survey($line['id'],$obj,$line['org'],$line['form']);
 				} else {
-					mysql_query("UPDATE end_users SET reserve = reserve-$needed WHERE id={$line['org']}");
+					mysqli_query("UPDATE end_users SET reserve = reserve-$needed WHERE id={$line['org']}");
 					//MAIL ABOUT LOW CREDIT
 					if(isset($admin)){
 						include_once('../../mail.php');
@@ -136,7 +136,7 @@ Thanks!");
 				echo 'You answered '.$num.' questions! Check info for your rewards.<br/>';
 				echo '<a href="info.php" accesskey="9">more info</a><br/>';
 			} else {
-				mysql_query("UPDATE visitors SET step = step +1 WHERE id = {$line['id']}");
+				mysqli_query("UPDATE visitors SET step = step +1 WHERE id = {$line['id']}");
 				$curr_q=clean_q($questions[$line['step']+1]);
 			}
 		}

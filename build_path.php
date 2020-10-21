@@ -13,8 +13,8 @@ function build_path($org,$node){
 
 	$out=array();
 	do {
-		$res=mysql_query("SELECT * FROM nodes_{$_SESSION['user']['org']} WHERE id = $node LIMIT 0,1");
-		$line=mysql_fetch_assoc($res);
+		$res=mysqli_query("SELECT * FROM nodes_{$_SESSION['user']['org']} WHERE id = $node LIMIT 0,1");
+		$line=mysqli_fetch_assoc($res);
 		if(is_array($line)){
 			$node=$line['parent'];
 			unset($line['parent']);

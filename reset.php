@@ -2,8 +2,8 @@
 @session_start();
 if ((isset($_POST['password']))&&(isset($_SESSION['accounts_to_reset']))){
 	include_once ('db.php');
-	mysql_query("UPDATE users SET password ='".md5($_POST['password'].'no-paps')."' WHERE uid IN (".implode(',',$_SESSION['accounts_to_reset']).")");
-	mysql_query("DELETE FROM lost_pass WHERE id = {$_SESSION['request_to_reset']} LIMIT 1");
+	mysqli_query("UPDATE users SET password ='".md5($_POST['password'].'no-paps')."' WHERE uid IN (".implode(',',$_SESSION['accounts_to_reset']).")");
+	mysqli_query("DELETE FROM lost_pass WHERE id = {$_SESSION['request_to_reset']} LIMIT 1");
 	$success="Passwords updated!";
 	unset($_SESSION['accounts_to_reset'],$_SESSION['request_to_reset']);
 	include('index.php');
@@ -14,8 +14,8 @@ if ((isset($_POST['password']))&&(isset($_SESSION['accounts_to_reset']))){
 }
 $title="Password Recovery";
 include ("head.php");
-$res=mysql_query("SELECT accounts from lost_pass WHERE id = ".(int)$_GET['id']." AND code = ".(int)$_GET['req']." AND submitted > DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0,1");
-if (($res)&&($data=mysql_fetch_array($res))){
+$res=mysqli_query("SELECT accounts from lost_pass WHERE id = ".(int)$_GET['id']." AND code = ".(int)$_GET['req']." AND submitted > DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0,1");
+if (($res)&&($data=mysqli_fetch_array($res))){
 ?>
 	<h1>Password Recovery</h1>
 	<p class="bg-grayLighter padding20">

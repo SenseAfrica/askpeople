@@ -28,10 +28,10 @@
 		
 		if(!$callbackData) return;
 		include_once('../../db.php');
-		$res=mysql_query('SELECT org, phone, msg, todo FROM pendingsms WHERE id = '.$callbackData);
-		if(($line=mysql_fetch_assoc($res))&&($deliveryStatus!='MessageWaiting')){
+		$res=mysqli_query('SELECT org, phone, msg, todo FROM pendingsms WHERE id = '.$callbackData);
+		if(($line=mysqli_fetch_assoc($res))&&($deliveryStatus!='MessageWaiting')){
 			file_put_contents('res.txt','ok');
-			mysql_query('DELETE FROM pendingsms WHERE id = '.$callbackData);
+			mysqli_query('DELETE FROM pendingsms WHERE id = '.$callbackData);
 			if (in_array($deliveryStatus,array('DeliveredToTerminal','DeliveredToNetwork'))) {
 				if (!is_null($line['todo'])) eval($line['todo']);
 			} else {

@@ -4,13 +4,13 @@ include_once('db.php');
 
 $_SESSION['last_form_id']= $in_id= (isset($_GET['id']))?$_GET['id']:((isset($_SESSION['last_form_id']))?$_SESSION['last_form_id']:false);
 
-if ((is_numeric($in_id)) && ($res=mysql_query("SELECT deactivator, alerter, phone,public, forms_{$_SESSION['user']['org']}.name, tablename,mail, forms_{$_SESSION['user']['org']}.node, forms_{$_SESSION['user']['org']}.active, fieldset, forms_{$_SESSION['user']['org']}.created, realname, submissions FROM forms_{$_SESSION['user']['org']}, users, form_view_{$_SESSION['user']['org']} WHERE forms_{$_SESSION['user']['org']}.id = {$in_id} AND creator = uid AND forms_{$_SESSION['user']['org']}.id=form_view_{$_SESSION['user']['org']}.id LIMIT 0,1")) && ($form=mysql_fetch_assoc($res))){
+if ((is_numeric($in_id)) && ($res=mysqli_query("SELECT deactivator, alerter, phone,public, forms_{$_SESSION['user']['org']}.name, tablename,mail, forms_{$_SESSION['user']['org']}.node, forms_{$_SESSION['user']['org']}.active, fieldset, forms_{$_SESSION['user']['org']}.created, realname, submissions FROM forms_{$_SESSION['user']['org']}, users, form_view_{$_SESSION['user']['org']} WHERE forms_{$_SESSION['user']['org']}.id = {$in_id} AND creator = uid AND forms_{$_SESSION['user']['org']}.id=form_view_{$_SESSION['user']['org']}.id LIMIT 0,1")) && ($form=mysqli_fetch_assoc($res))){
 	$tbname='form_'.$_SESSION['user']['org'].'_'.$form['tablename'];
-	if ($res=mysql_list_fields ($sql_details['db'],$tbname)){
+	if ($res=mysqli_list_fields ($sql_details['db'],$tbname)){
 		$_SESSION['formFields']=array();
 		$i=0;
 		$_SESSION['formId']=$form['tablename'];
-		while (@$field=mysql_field_name($res,$i)){
+		while (@$field=mysqli_field_name($res,$i)){
 			$i++;
 			if ($field=='submit_node') $_SESSION['formFields'][]='sub-unit';
 			else if (($field!='submit_id')&&($field!='submit_location')) $_SESSION['formFields'][]=$field;
@@ -33,14 +33,14 @@ if ((is_numeric($in_id)) && ($res=mysql_query("SELECT deactivator, alerter, phon
 if(isset($_POST['status'])){
 	$_POST['public']=((isset($_POST['public']))&&($_POST['public']=='on'))?1:0;
 	if($form['public']!=$_POST['public']) {
-		mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET public = '.$_POST['public'].' WHERE id='.$in_id);
+		mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET public = '.$_POST['public'].' WHERE id='.$in_id);
 		$form['public']=$_POST['public'];
 	}
 	if($_POST['target']!=$form['node']) {
 		$_POST['target']=(int)$_POST['target'];
 		include_once('shownode.php');
 		if(show_node($_POST['target'])){
-			mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET node = '.$_POST['target'].' WHERE id='.$in_id);			
+			mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET node = '.$_POST['target'].' WHERE id='.$in_id);			
 			check_node($form['node']);
 			$form['node']=$_POST['target'];
 		}
@@ -48,51 +48,51 @@ if(isset($_POST['status'])){
 	if($_POST['status']=='0'){
 		if ($form['active']) {
 			include_once('shownode.php');
-			mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET active = 0 WHERE id='.$in_id);
+			mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET active = 0 WHERE id='.$in_id);
 			check_node($form['node']);
 			$form['active']=0;
 		}
 	} else if (!$form['active']) {
 		include_once('shownode.php');
-		mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET active = 1 WHERE id='.$in_id);
+		mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET active = 1 WHERE id='.$in_id);
 		show_node($form['node']);
 		$form['active']=1;
 	}
 	
 	if($_POST['deactivate']=='0') {
 		if ($form['deactivator']) {
-			mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET deactivator = 0 WHERE id='.$in_id);
+			mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET deactivator = 0 WHERE id='.$in_id);
 			$form['deactivator']=0;
 		}
 	} else {
 		$form['deactivator']=max(0,min((int)$_POST['deactivator'],50000));
-		mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET deactivator = '.$form['deactivator'].' WHERE id='.$in_id);
+		mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET deactivator = '.$form['deactivator'].' WHERE id='.$in_id);
 	}
 	if($_POST['alert']=='0') {
 		if ($form['alerter']) {
-			mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET alerter = 0 WHERE id='.$in_id);
+			mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET alerter = 0 WHERE id='.$in_id);
 			$form['alerter']=0;
 		}
 	} else {
 		$form['alerter']=max(0,min((int)$_POST['alerter'],1000));		
-		mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET alerter = '.$form['alerter'].' WHERE id='.$in_id);
+		mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET alerter = '.$form['alerter'].' WHERE id='.$in_id);
 	}
 	$_POST['phone']=(int)preg_replace("/[^0-9]/", '', $_POST['phone']);
 	if(!$_POST['phone']){
 		if($form['phone']) {
-			mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET phone = NULL WHERE id='.$in_id);
+			mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET phone = NULL WHERE id='.$in_id);
 			$form['phone']=null;
 		}
 	}else {
 		if($_POST['phone']!=$form['phone']){
-			mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET phone = '.$_POST['phone'].' WHERE id='.$in_id);
+			mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET phone = '.$_POST['phone'].' WHERE id='.$in_id);
 			$form['phone']=$_POST['phone'];
 		}
 	}
 	
 	$_POST['mail']=filter_var($_POST['mail'],FILTER_VALIDATE_EMAIL);
 	if (($_POST['mail'])&& ($_POST['mail']!=$form['mail'])){
-		mysql_query('UPDATE forms_'.$_SESSION['user']['org'].' SET mail = '.$_POST['mail'].' WHERE id='.$in_id);
+		mysqli_query('UPDATE forms_'.$_SESSION['user']['org'].' SET mail = '.$_POST['mail'].' WHERE id='.$in_id);
 		$form['mail']=$_POST['mail'];
 	}
 	$success="Form settings were updated.";
@@ -203,9 +203,9 @@ include ("head.php");
 					<script src="js/dygraph-combined.js"></script>
 					<script>
 					<?php
-						$res=mysql_query("SELECT * FROM stats_{$_SESSION['user']['org']} WHERE form = $in_id "/*.'AND node IN ('.implode(',',$_SESSION['selected_nodes']).')'*/);
+						$res=mysqli_query("SELECT * FROM stats_{$_SESSION['user']['org']} WHERE form = $in_id "/*.'AND node IN ('.implode(',',$_SESSION['selected_nodes']).')'*/);
 						$graph=array();
-						while ($line=mysql_fetch_assoc($res)) $graph[$line['hour']]=$line['count'];
+						while ($line=mysqli_fetch_assoc($res)) $graph[$line['hour']]=$line['count'];
 						if (!empty($graph)){
 							$out="Hour,Submissions\\n";
 							foreach ($graph as $time=>$datum) $out.=date('Y-m-d H:i:s',($time*60*60)).",$datum\\n";
@@ -272,19 +272,19 @@ include ("head.php");
 					//Integers
 					$name=cut_out($question,'name="','">');
 					
-					$res=mysql_query("SELECT AVG($name) AS mean FROM $tbname");
-					$line=mysql_fetch_assoc($res);
+					$res=mysqli_query("SELECT AVG($name) AS mean FROM $tbname");
+					$line=mysqli_fetch_assoc($res);
 					$mean=$line['mean'];
 					
-					$res=mysql_query("SELECT CEIL(COUNT(*)/2) AS mid FROM $tbname");
-					$line=mysql_fetch_assoc($res);
+					$res=mysqli_query("SELECT CEIL(COUNT(*)/2) AS mid FROM $tbname");
+					$line=mysqli_fetch_assoc($res);
 					$median=$line['mid'];
-					$res=mysql_query("SELECT MAX($name) AS median FROM (SELECT $name FROM $tbname ORDER BY $name limit $median) x");
-					$line=mysql_fetch_assoc($res);
+					$res=mysqli_query("SELECT MAX($name) AS median FROM (SELECT $name FROM $tbname ORDER BY $name limit $median) x");
+					$line=mysqli_fetch_assoc($res);
 					$median=$line['median'];
 					
-					$res=mysql_query("SELECT $name AS mode, COUNT(*) AS x FROM $tbname GROUP BY $name ORDER BY x DESC LIMIT 1");
-					$line=mysql_fetch_assoc($res);
+					$res=mysqli_query("SELECT $name AS mode, COUNT(*) AS x FROM $tbname GROUP BY $name ORDER BY x DESC LIMIT 1");
+					$line=mysqli_fetch_assoc($res);
 					$mode=$line['mode'];
 					
 					array_unshift(
@@ -362,9 +362,9 @@ include ("head.php");
 						if($i) echo',';
 						echo '{labels:["'.implode('","',$chart_data[$i]['options']).'"],';
 						
-						$res=mysql_query("SELECT {$chart_data[$i]['column']} AS label, COUNT({$chart_data[$i]['column']}) AS num FROM $tbname GROUP BY {$chart_data[$i]['column']}");
+						$res=mysqli_query("SELECT {$chart_data[$i]['column']} AS label, COUNT({$chart_data[$i]['column']}) AS num FROM $tbname GROUP BY {$chart_data[$i]['column']}");
 						$data=array_fill (0,count($chart_data[$i]['options']),0);
-						while ($line=mysql_fetch_assoc($res)) $data[array_search($line['label'],$chart_data[$i]['options'])]=$line['num'];
+						while ($line=mysqli_fetch_assoc($res)) $data[array_search($line['label'],$chart_data[$i]['options'])]=$line['num'];
 						
 						echo 'datasets:[{'.$colors[$i%3].'data:['.implode(',',$data).']}]}';
 					}
@@ -501,8 +501,8 @@ include ("head.php");
 					<div class="input-control select">
 						<select name="target">
 							<?php
-							$res=mysql_query('SELECT id, name FROM nodes_'.$_SESSION['user']['org']);
-							while ($line=mysql_fetch_assoc($res)) echo '<option '.(($line['id']==$form['node'])?'selected="selected"':'').'value="'.$line['id'].'">'.$line['name'].'</option>';
+							$res=mysqli_query('SELECT id, name FROM nodes_'.$_SESSION['user']['org']);
+							while ($line=mysqli_fetch_assoc($res)) echo '<option '.(($line['id']==$form['node'])?'selected="selected"':'').'value="'.$line['id'].'">'.$line['name'].'</option>';
 							?>
 						</select>
 					</div>

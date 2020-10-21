@@ -54,13 +54,13 @@ function check_node($node,$org=false){
 		$node=$ln['node'];
 	} else if(isset($_SESSION['user']['org'])) $org=$_SESSION['user']['org'];
 	else return;
-	$res=mysql_query("SELECT id FROM forms_$org WHERE node=$node AND active = 1 LIMIT 0,1");
-	if(!(mysql_num_rows($res))){
-		$res=mysql_query("SELECT profile FROM profiling WHERE org=$org AND node =$node");
-		$line=mysql_fetch_assoc($res);
-		mysql_query("DELETE FROM profiling WHERE org=$org AND node =$node");
-		$res=mysql_query("SELECT org FROM profiling WHERE profile={$line['profile']} LIMIT 0,1");
-		if(!(mysql_num_rows($res))) mysql_query("DELETE FROM profiles WHERE id ={$line['profile']}");
+	$res=mysqli_query("SELECT id FROM forms_$org WHERE node=$node AND active = 1 LIMIT 0,1");
+	if(!(mysqli_num_rows($res))){
+		$res=mysqli_query("SELECT profile FROM profiling WHERE org=$org AND node =$node");
+		$line=mysqli_fetch_assoc($res);
+		mysqli_query("DELETE FROM profiling WHERE org=$org AND node =$node");
+		$res=mysqli_query("SELECT org FROM profiling WHERE profile={$line['profile']} LIMIT 0,1");
+		if(!(mysqli_num_rows($res))) mysqli_query("DELETE FROM profiles WHERE id ={$line['profile']}");
 	}
 }
 ?>

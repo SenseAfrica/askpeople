@@ -10,14 +10,14 @@ set_time_limit(0);
 include_once ('db.php');
 if (isset($_POST['orgname'])){
 	if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
-		//$res=mysql_query('INSERT INTO nodes (name) VALUES ("'.mysql_real_escape_string($_POST['orgname']).'")');
-		//if (($res)&&(mysql_affected_rows())&&($rid=mysql_insert_id())) {
+		//$res=mysqli_query('INSERT INTO nodes (name) VALUES ("'.mysqli_real_escape_string($_POST['orgname']).'")');
+		//if (($res)&&(mysqli_affected_rows())&&($rid=mysqli_insert_id())) {
 			if(true) { $rid=1;
-			//$res2=mysql_query('INSERT INTO end_users (name) VALUES ("'.mysql_real_escape_string($_POST['orgname']).'", '.$rid.')');
-			$res2=mysql_query('INSERT INTO end_users (name,phone) VALUES ("'.mysql_real_escape_string($_POST['orgname']).'",'.(int)$_POST['phone'].')');
+			//$res2=mysqli_query('INSERT INTO end_users (name) VALUES ("'.mysqli_real_escape_string($_POST['orgname']).'", '.$rid.')');
+			$res2=mysqli_query('INSERT INTO end_users (name,phone) VALUES ("'.mysqli_real_escape_string($_POST['orgname']).'",'.(int)$_POST['phone'].')');
 		}
 		else $res2=false;
-		if (($res2)&&(mysql_affected_rows())&&($id=mysql_insert_id())){
+		if (($res2)&&(mysqli_affected_rows())&&($id=mysqli_insert_id())){
 			
 			/*
 			if ($_FILES['logo']['size']>=3145728) $error="Upload error. File too bog.";
@@ -26,8 +26,8 @@ if (isset($_POST['orgname'])){
 			} else $error="Error during logo upload.";
 			*/
 			include ('upload_pic.php');
-			$_POST['realname']=(empty($_POST['realname']))?'NULL':"'".mysql_real_escape_string($_POST['realname'])."'";
-			$res=mysql_query('INSERT INTO users (password, admin, org, email, realname, node) VALUES ("'.md5($_POST['password'].'no-paps').'", 1, '.$id.', "'.mysql_real_escape_string($_POST['email']).'", '.$_POST['realname'].', '.$rid.')');
+			$_POST['realname']=(empty($_POST['realname']))?'NULL':"'".mysqli_real_escape_string($_POST['realname'])."'";
+			$res=mysqli_query('INSERT INTO users (password, admin, org, email, realname, node) VALUES ("'.md5($_POST['password'].'no-paps').'", 1, '.$id.', "'.mysqli_real_escape_string($_POST['email']).'", '.$_POST['realname'].', '.$rid.')');
 			$big_query ="
 CREATE TABLE `forms_$id` (
 `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -52,7 +52,7 @@ CREATE TABLE `nodes_$id` (
   `parent` int(11) DEFAULT NULL
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO nodes_{$id} (name) VALUES ('"./*mysql_real_escape_string($_POST['orgname']).*/"[ALL]');
+INSERT INTO nodes_{$id} (name) VALUES ('"./*mysqli_real_escape_string($_POST['orgname']).*/"[ALL]');
 
 CREATE TABLE `extra_nodes_{$id}` (
 `id` int(11) NOT NULL AUTO_INCREMENT  PRIMARY KEY,
@@ -92,12 +92,12 @@ CREATE VIEW form_view_{$id} AS SELECT active, created, forms_{$id}.id, forms_{$i
 
 			$small_query="DROP VIEW form_view_{$id}; DROP VIEW agent_view_{$id}; [X]; DROP table `stats_{$id}`; [X]; DROP table `submissions_{$id}`; [X]; DROP table `extra_nodes_{$id}`; [X]; DROP table `nodes_{$id}`; DROP table `forms_{$id}`; DELETE FROM end_users WHERE id = {$id} LIMIT 1";
 			
-			if (($res)&&(mysql_affected_rows())){
-				$user=mysql_insert_id();
+			if (($res)&&(mysqli_affected_rows())){
+				$user=mysqli_insert_id();
 				//all is well
 				$i=0;
 				$queries=explode(';',$big_query);
-				foreach ($queries as $query) if (mysql_query($debug=trim($query))) {$debug="";$i++;} else {$debug.=' -> '.mysql_error();break;}
+				foreach ($queries as $query) if (mysqli_query($debug=trim($query))) {$debug="";$i++;} else {$debug.=' -> '.mysqli_error();break;}
 				if($i==11){
 					$success="Organization account successfully created";
 					include_once('mail.php');
@@ -110,19 +110,19 @@ CREATE VIEW form_view_{$id} AS SELECT active, created, forms_{$id}.id, forms_{$i
 				} else {
 					//echo $i.' '.$debug;
 					$queries=explode(';',$small_query);
-					for ($j=11-$i;$j<12;$j++) if (($query=trim($queries[$j]))!='[X]') mysql_query($query);
+					for ($j=11-$i;$j<12;$j++) if (($query=trim($queries[$j]))!='[X]') mysqli_query($query);
 					$alert ="Database Error 1. Please Try Again Later.";
-					mysql_query('DELETE FROM users WHERE id = '.$user.' LIMIT 1');
-					mysql_query('DELETE FROM end_users WHERE id = '.$id.' LIMIT 1');
+					mysqli_query('DELETE FROM users WHERE id = '.$user.' LIMIT 1');
+					mysqli_query('DELETE FROM end_users WHERE id = '.$id.' LIMIT 1');
 				}
 			} else {
-				mysql_query('DELETE FROM end_users WHERE id = '.$id.' LIMIT 1');
-				//mysql_query('DELETE FROM nodes WHERE id = '.$rid.' LIMIT 1');
+				mysqli_query('DELETE FROM end_users WHERE id = '.$id.' LIMIT 1');
+				//mysqli_query('DELETE FROM nodes WHERE id = '.$rid.' LIMIT 1');
 				$alert="Account creation error. Probably email is already taken.";
 			}
 		} else {
 			$alert="Database Error 2. Please Try Again Later.";
-			//if (isset($rid)) mysql_query('DELETE FROM nodes WHERE id = '.$rid.' LIMIT 1');
+			//if (isset($rid)) mysqli_query('DELETE FROM nodes WHERE id = '.$rid.' LIMIT 1');
 		}
 	} else $alert="Invalid e-mail. Please Try Again.";
 }

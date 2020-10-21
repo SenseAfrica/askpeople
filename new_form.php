@@ -32,14 +32,14 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 			$qry.="`{$field['id']}` {$type[$field['type']]} ".(($field['req'])?'NOT':'DEFAULT')." NULL,";
 			break;
 		case 'enum':
-			$qry.="`{$field['id']}` enum('".implode("','",array_map('mysql_real_escape_string',$field['values']))."') DEFAULT NULL,";
+			$qry.="`{$field['id']}` enum('".implode("','",array_map('mysqli_real_escape_string',$field['values']))."') DEFAULT NULL,";
 			break;
 	}
 	$qry=rtrim($qry,',').") ENGINE=MyISAM DEFAULT CHARSET=utf8";
-	$res=mysql_query($qry);
+	$res=mysqli_query($qry);
 	if ($res){
-		mysql_query("UPDATE end_users SET credits = credits-1000 WHERE id = {$_SESSION['user']['org']} AND credits-reserve >999 LIMIT 1");
-		if (mysql_affected_rows()){
+		mysqli_query("UPDATE end_users SET credits = credits-1000 WHERE id = {$_SESSION['user']['org']} AND credits-reserve >999 LIMIT 1");
+		if (mysqli_affected_rows()){
 			$last=end($_SESSION['temp_path']);
 			
 			$in_mail=false;
@@ -51,13 +51,13 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 			}
 			if(!$in_mail) $in_mail=$_SESSION['user']['email'];
 			
-			mysql_query($qry="INSERT INTO forms_{$_SESSION['user']['org']} (name,tablename,node,public,fieldset,creator,mail) VALUES ('".
-			mysql_real_escape_string($_SESSION['stored_form']['name'])."','$tbtime',".
+			mysqli_query($qry="INSERT INTO forms_{$_SESSION['user']['org']} (name,tablename,node,public,fieldset,creator,mail) VALUES ('".
+			mysqli_real_escape_string($_SESSION['stored_form']['name'])."','$tbtime',".
 			((isset($_POST['numbers']))?'NULL,1':$last['id'].',0').",'".
-			mysql_real_escape_string($_SESSION['stored_form']['content'])."',{$_SESSION['user']['uid']},'".mysql_real_escape_string($in_mail)."')");
-			if ($id=mysql_insert_id()){
+			mysqli_real_escape_string($_SESSION['stored_form']['content'])."',{$_SESSION['user']['uid']},'".mysqli_real_escape_string($in_mail)."')");
+			if ($id=mysqli_insert_id()){
 				if (isset($_POST['numbers'])) {
-					if ($id=mysql_insert_id()){
+					if ($id=mysqli_insert_id()){
 						$tmp=array_filter(array_map('trim',explode(',',$_POST['numbers'])),'good_num');
 						if (empty($tmp)) $alert="No valid number!";
 						else {
@@ -84,13 +84,13 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 						if(isset($crit['sex'])) $options[]='gender = '.(($crit['sex']=='M')?1:0);
 						$tags=array('ed','job','kids');
 						for($i=0;$i<3;$i++) if(isset($crit[$tags[$i]])) for($j=0;$j<3;$j++) if(!in_array($j,$crit[$tags[$i]])) $options[]='NOT('.$tags[$i].' = '.$j.')';						
-						$res=mysql_query('SELECT id,phone FROM visitors WHERE '.((empty($options))?1:implode(' AND ',$options)).' ORDER BY RAND() LIMIT 0,50');
-						if($ln=mysql_fetch_array($res)){
-							$res2=mysql_query("SELECT (UNIX_TIMESTAMP(created) % 1000) AS secret FROM `forms_{$_SESSION['user']['org']}` WHERE id=$id");
-							$l=mysql_fetch_array($res2);
+						$res=mysqli_query('SELECT id,phone FROM visitors WHERE '.((empty($options))?1:implode(' AND ',$options)).' ORDER BY RAND() LIMIT 0,50');
+						if($ln=mysqli_fetch_array($res)){
+							$res2=mysqli_query("SELECT (UNIX_TIMESTAMP(created) % 1000) AS secret FROM `forms_{$_SESSION['user']['org']}` WHERE id=$id");
+							$l=mysqli_fetch_array($res2);
 							do {
 								sms(0,$ln['phone'],"New survey picked for you: {$_SESSION['stored_form']['name']} by {$_SESSION['user']['name']}. Use survey-code: {$_SESSION['user']['org']}.{$id}.".($l['secret']+$ln['id'])." to access it.");
-							} while($ln=mysql_fetch_array($res));
+							} while($ln=mysqli_fetch_array($res));
 						}
 						
 					}
@@ -111,7 +111,7 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 				}
 			} else $error="There was an error in creating the survey table";
 		} else {
-			mysql_query("DROP TABLE `$tbname`");
+			mysqli_query("DROP TABLE `$tbname`");
 			if (!isset($alert)) $alert="Not enough credit!";
 		}
 	}else $alert="Unable to create form table. Please contact administrator.";

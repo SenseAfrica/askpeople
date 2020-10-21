@@ -38,8 +38,8 @@ if (isset($_POST['new_node'])) {
 		if(!empty($arr)) $new_crit[$item]=$arr;
 		else if (isset($criteria[$item])) $new_crit[$item]=$criteria[$item];
 	}
-	$res=mysql_query("INSERT INTO nodes_{$_SESSION['user']['org']} (parent,name,criteria) VALUES ($node,'".mysql_real_escape_string(ucwords(strtolower($_POST['new_node'])))."','".json_encode($new_crit)."')");
-	if (($res)&&(mysql_affected_rows())) {
+	$res=mysqli_query("INSERT INTO nodes_{$_SESSION['user']['org']} (parent,name,criteria) VALUES ($node,'".mysqli_real_escape_string(ucwords(strtolower($_POST['new_node'])))."','".json_encode($new_crit)."')");
+	if (($res)&&(mysqli_affected_rows())) {
 		$success = "\"{$_POST['new_node']}\" sub-unit was created";
 	}
 	else $alert="Database Error. Please Try Again Later.";
@@ -47,22 +47,22 @@ if (isset($_POST['new_node'])) {
 	$del = (int) $_GET['delete'];
 	if (is_numeric($last['id'])) {
 		//check valid
-		$res = mysql_query("SELECT id FROM nodes_{$_SESSION['user']['org']} WHERE id = $del AND parent = {$last['id']} LIMIT 0,1");
-		if (mysql_num_rows($res)){
+		$res = mysqli_query("SELECT id FROM nodes_{$_SESSION['user']['org']} WHERE id = $del AND parent = {$last['id']} LIMIT 0,1");
+		if (mysqli_num_rows($res)){
 			$to_del=array();
 			$parents=array($del);
 			$children=array();
 			while (!empty($parents)) {
-				$res=mysql_query("SELECT id FROM nodes_{$_SESSION['user']['org']} WHERE parent IN (".implode(',',$parents).')');
-				while ($line=mysql_fetch_assoc($res)) $children[]=$line['id'];
+				$res=mysqli_query("SELECT id FROM nodes_{$_SESSION['user']['org']} WHERE parent IN (".implode(',',$parents).')');
+				while ($line=mysqli_fetch_assoc($res)) $children[]=$line['id'];
 				$to_del=array_merge($to_del,$parents);
 				$parents=$children;
 				$children=array();
 			}
 			$to_del=implode(',',$to_del);
-			mysql_query("DELETE FROM nodes_{$_SESSION['user']['org']} WHERE id IN ($to_del)");
-			mysql_query("UPDATE users SET node = {$last['id']} WHERE node IN ($to_del)");
-			mysql_query("UPDATE forms SET node = {$last['id']} WHERE node IN ($to_del)");
+			mysqli_query("DELETE FROM nodes_{$_SESSION['user']['org']} WHERE id IN ($to_del)");
+			mysqli_query("UPDATE users SET node = {$last['id']} WHERE node IN ($to_del)");
+			mysqli_query("UPDATE forms SET node = {$last['id']} WHERE node IN ($to_del)");
 		} else $error = "Please check your input.";
 	} else $error = "Please check your input.";
 }
@@ -125,8 +125,8 @@ include_once ("head.php");
                     <div class="span4 subnodes">
 					<h2>Market sub-units <button title='add sub-unit'onclick='javascript:add_node("<?php echo addslashes($last['name']); ?>")'class="bg-gray fg-white"><i class="icon-plus"></i></button></h2>
 						<?php
-							$res=mysql_query("SELECT id, name FROM nodes_{$_SESSION['user']['org']} WHERE parent = ".$last['id'].' ORDER BY id DESC');
-							while($line=mysql_fetch_assoc($res)){
+							$res=mysqli_query("SELECT id, name FROM nodes_{$_SESSION['user']['org']} WHERE parent = ".$last['id'].' ORDER BY id DESC');
+							while($line=mysqli_fetch_assoc($res)){
 							 echo 
 							 "<a href='?node={$line['id']}'><button class='bg-lightBlue fg-white'>".
 								((isset($embedded))?'':"<div title='delete this unit'onclick='return remove_node({$line['id']},\"".addslashes($line['name'])."\",\"".addslashes($last['name'])."\")'><i class='icon-remove'></i></div>").
@@ -139,8 +139,8 @@ include_once ("head.php");
 					<div class="span4 subnodes">
 					<h2>Assigned agents <a href='new_agent.php?node=<?php echo addslashes($last['id']); ?>'><button title='add agent to "<?php echo addslashes($last['name']); ?>"'class="bg-gray fg-white"><i class="icon-plus"></i></button></a></h2>
 						<?php
-							$res=mysql_query('SELECT uid, realname, admin FROM users WHERE org = '.$_SESSION['user']['org'].' AND node = '.$last['id'].' AND active = 1 ORDER BY admin DESC, uid DESC');
-							while($line=mysql_fetch_assoc($res)){
+							$res=mysqli_query('SELECT uid, realname, admin FROM users WHERE org = '.$_SESSION['user']['org'].' AND node = '.$last['id'].' AND active = 1 ORDER BY admin DESC, uid DESC');
+							while($line=mysqli_fetch_assoc($res)){
 								$name=$line['realname'];
 							 echo 
 							 "<a href='view_agent.php?id={$line['uid']}'><button class='bg-".(($line['admin'])?'amber':'magenta')." fg-white'>$name<b>&hellip;</b></button></a>";
@@ -150,8 +150,8 @@ include_once ("head.php");
 					<div class="span4 subnodes">
 					<h2>Surveys <a href='new_form.php?node=<?php echo addslashes($last['id']); ?>'><button title='send form to "<?php echo addslashes($last['name']); ?>"'class="bg-gray fg-white"><i class="icon-plus"></i></button></a></h2>
 						<?php
-							$res=mysql_query("SELECT forms_{$_SESSION['user']['org']}.id, active, name, COUNT(submissions_{$_SESSION['user']['org']}.id) AS submissions FROM forms_{$_SESSION['user']['org']} LEFT JOIN submissions_{$_SESSION['user']['org']} ON forms_{$_SESSION['user']['org']}.id=form WHERE node = {$last['id']} GROUP BY forms_{$_SESSION['user']['org']}.id ORDER BY active DESC, id DESC");
-							while($line=mysql_fetch_assoc($res)){
+							$res=mysqli_query("SELECT forms_{$_SESSION['user']['org']}.id, active, name, COUNT(submissions_{$_SESSION['user']['org']}.id) AS submissions FROM forms_{$_SESSION['user']['org']} LEFT JOIN submissions_{$_SESSION['user']['org']} ON forms_{$_SESSION['user']['org']}.id=form WHERE node = {$last['id']} GROUP BY forms_{$_SESSION['user']['org']}.id ORDER BY active DESC, id DESC");
+							while($line=mysqli_fetch_assoc($res)){
 							 echo 
 							 "<a href='view_form.php?id={$line['id']}'><button class='bg-".(($line['active'])?'emerald':'gray')." fg-white'>{$line['name']}<i class='icon-copy'> {$line['submissions']}</i><b>&hellip;</b>
                             </button></a>";
