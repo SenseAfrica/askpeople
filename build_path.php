@@ -1,4 +1,5 @@
 <?php
+include_once ('db.php');
 function build_path($org,$node){
 	$org =(int) $org;
 	$node =(int) $node;
