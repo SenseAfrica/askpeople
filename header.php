@@ -157,10 +157,10 @@
 			<a href="index.php"style="color:white!important"><button class="element image-button image-left place-right">
 				<?php
 				echo $_SESSION['user']['name'];
-				if ((isset($_POST['HWINPUTS-topup']))&&(is_numeric($_POST['HWINPUTS-topup']))&&($_POST['HWINPUTS-topup']>0)) mysql_query('UPDATE end_users SET credits = credits+'.$_POST['HWINPUTS-topup'].' WHERE id='.$_SESSION['user']['org']);
+				if ((isset($_POST['HWINPUTS-topup']))&&(is_numeric($_POST['HWINPUTS-topup']))&&($_POST['HWINPUTS-topup']>0)) mysqli_query('UPDATE end_users SET credits = credits+'.$_POST['HWINPUTS-topup'].' WHERE id='.$_SESSION['user']['org']);
 				if($_SESSION['user']['admin']){
-					$res=mysql_query('SELECT credits FROM end_users WHERE id='.$_SESSION['user']['org']);
-					$line=mysql_fetch_assoc($res);
+					$res=mysqli_query('SELECT credits FROM end_users WHERE id='.$_SESSION['user']['org']);
+					$line=mysqli_fetch_assoc($res);
 					echo ' : '.($_SESSION['user']['credits']=$line['credits']).' XOF';
 				}
 				echo'<img src="'.((file_exists("logos/{$_SESSION['user']['org']}.jpg"))?"logos/{$_SESSION['user']['org']}.jpg":'images/default_logo.png').'">';
