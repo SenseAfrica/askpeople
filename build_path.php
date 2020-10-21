@@ -1,6 +1,6 @@
 <?php
-include_once ('db.php');
 function build_path($org,$node){
+	global $db_conn;
 	$org =(int) $org;
 	$node =(int) $node;
 	//returns path array if org is correct, or false otherwise
