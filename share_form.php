@@ -11,6 +11,6 @@ if ((isset($_GET['id']))&&(isset($_SESSION['user']['org']))) {
 		exit;
 	}
 	$res=mysqli_query($db_conn,"INSERT INTO share_form (org,tbl,name) VALUES ({$_SESSION['user']['org']},$tbl,'$name')");
-	echo (mysqli_insert_id());
+	echo (mysqli_insert_id($db_conn));
 }
 ?>

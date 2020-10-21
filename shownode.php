@@ -35,7 +35,7 @@ function show_node($node,$last=false){
 			for($i=0;$i<count($nulls);$i++) $qry.=',0';
 			$qry.=")";
 			mysqli_query($db_conn,$qry);
-			$profile=mysqli_insert_id();
+			$profile=mysqli_insert_id($db_conn);
 		}
 		if ($profile){
 			$res=mysqli_query($db_conn,"INSERT INTO profiling (org,node,profile) VALUES ({$_SESSION['user']['org']},$node,$profile)");

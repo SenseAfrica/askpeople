@@ -15,7 +15,7 @@ if (isset($_GET['mail'])){
 			$code = substr(mt_rand().'',0,8);
 			if ($code==floor($code/10)*10) $code+=1;
 			mysqli_query($db_conn,"INSERT INTO lost_pass (accounts,code) VALUES ('".json_encode($accts)."',$code)");
-			$id=mysqli_insert_id();
+			$id=mysqli_insert_id($db_conn);
 			$msg=
 "<html>Greetings!
 We have received a password-reset request for your e-mail ({$_GET['mail']}).<br/>

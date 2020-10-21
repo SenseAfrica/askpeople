@@ -9,7 +9,7 @@ if(isset($_POST['HWINPUTS-submit'])){
 		$result = trim(fread($fh,8192));
 		if ($result == 'TRUE') {
 			mysqli_query($db_conn,'INSERT INTO visitors (step,birth,gender,ed,job,kids) VALUES (5,'.(int)$_POST['HWINPUTS-birth'].','.(int)$_POST['HWINPUTS-gender'].','.(int)$_POST['HWINPUTS-ed'].','.(int)$_POST['HWINPUTS-job'].','.(int)$_POST['HWINPUTS-kids'].')');
-			if ($id=mysqli_insert_id()) $_SESSION['submitter_id']=(int)$id;
+			if ($id=mysqli_insert_id($db_conn)) $_SESSION['submitter_id']=(int)$id;
 			else $alert="Something went wrong (database error). Try again later.";
 		}
 		else $alert="You entered the wrong captcha code!";

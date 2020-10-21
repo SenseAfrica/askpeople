@@ -58,9 +58,9 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 			mysqli_real_escape_string($db_conn,$_SESSION['stored_form']['name'])."','$tbtime',".
 			((isset($_POST['numbers']))?'NULL,1':$last['id'].',0').",'".
 			mysqli_real_escape_string($db_conn,$_SESSION['stored_form']['content'])."',{$_SESSION['user']['uid']},'".mysqli_real_escape_string($db_conn,$in_mail)."')");
-			if ($id=mysqli_insert_id()){
+			if ($id=mysqli_insert_id($db_conn)){
 				if (isset($_POST['numbers'])) {
-					if ($id=mysqli_insert_id()){
+					if ($id=mysqli_insert_id($db_conn)){
 						$tmp=array_filter(array_map('trim',explode(',',$_POST['numbers'])),'good_num');
 						if (empty($tmp)) $alert="No valid number!";
 						else {

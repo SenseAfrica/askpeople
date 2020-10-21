@@ -12,7 +12,7 @@ function sms($org,$phone,$msg,$dr=0,$todo=false){
 	include_once('../db.php');
 	if($dr){
 		mysqli_query($db_conn,"INSERT INTO pendingsms (org,phone,msg".(($todo)?',todo':'').") VALUES ($org,$phone,'".mysqli_real_escape_string($db_conn,$msg)."'".(($todo)?(",'".mysqli_real_escape_string($db_conn,$todo)."'"):'').")");
-		$dr=mysqli_insert_id();
+		$dr=mysqli_insert_id($db_conn);
 	}
 	//$org=0 means SEND FOR FREE
 	if ($org) mysqli_query($db_conn,"UPDATE end_users SET credits = credits - 10 WHERE id=$org AND (credits-reserve)>9");

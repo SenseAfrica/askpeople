@@ -11,13 +11,13 @@ include_once ('db.php');
 if (isset($_POST['orgname'])){
 	if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
 		//$res=mysqli_query($db_conn,'INSERT INTO nodes (name) VALUES ("'.mysqli_real_escape_string($db_conn,$_POST['orgname']).'")');
-		//if (($res)&&(mysqli_affected_rows($db_conn))&&($rid=mysqli_insert_id())) {
+		//if (($res)&&(mysqli_affected_rows($db_conn))&&($rid=mysqli_insert_id($db_conn))) {
 			if(true) { $rid=1;
 			//$res2=mysqli_query($db_conn,'INSERT INTO end_users (name) VALUES ("'.mysqli_real_escape_string($db_conn,$_POST['orgname']).'", '.$rid.')');
 			$res2=mysqli_query($db_conn,'INSERT INTO end_users (name,phone) VALUES ("'.mysqli_real_escape_string($db_conn,$_POST['orgname']).'",'.(int)$_POST['phone'].')');
 		}
 		else $res2=false;
-		if (($res2)&&(mysqli_affected_rows($db_conn))&&($id=mysqli_insert_id())){
+		if (($res2)&&(mysqli_affected_rows($db_conn))&&($id=mysqli_insert_id($db_conn))){
 			
 			/*
 			if ($_FILES['logo']['size']>=3145728) $error="Upload error. File too bog.";
@@ -93,7 +93,7 @@ CREATE VIEW form_view_{$id} AS SELECT active, created, forms_{$id}.id, forms_{$i
 			$small_query="DROP VIEW form_view_{$id}; DROP VIEW agent_view_{$id}; [X]; DROP table `stats_{$id}`; [X]; DROP table `submissions_{$id}`; [X]; DROP table `extra_nodes_{$id}`; [X]; DROP table `nodes_{$id}`; DROP table `forms_{$id}`; DELETE FROM end_users WHERE id = {$id} LIMIT 1";
 			
 			if (($res)&&(mysqli_affected_rows($db_conn))){
-				$user=mysqli_insert_id();
+				$user=mysqli_insert_id($db_conn);
 				//all is well
 				$i=0;
 				$queries=explode(';',$big_query);

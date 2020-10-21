@@ -14,7 +14,7 @@ function submit_survey($visitor,$obj,$org,$form,$form_title='',$admin_mail=false
 	$res=mysqli_query($db_conn,'INSERT INTO form_'.$org.'_'.$line2['tablename'].' ('.implode(',',$keys).') VALUES ('.implode(',',$values).')');
 	//echo 'INSERT INTO form_'.$org.'_'.$line2['tablename'].' ('.implode(',',$keys).') VALUES ('.implode(',',$values).')'.'<br/>';
 	if(($res)&&(mysqli_affected_rows($db_conn))){
-		$id=mysqli_insert_id();
+		$id=mysqli_insert_id($db_conn);
 		mysqli_query($db_conn,"INSERT INTO submissions_$org (agent,form,row_id) VALUES ($visitor,$form,$id)");
 		//echo "INSERT INTO submissions_$org (agent,form,row_id) VALUES ($visitor,$form,$id)";
 		
