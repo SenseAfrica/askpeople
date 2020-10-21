@@ -32,13 +32,16 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 			$qry.="`{$field['id']}` {$type[$field['type']]} ".(($field['req'])?'NOT':'DEFAULT')." NULL,";
 			break;
 		case 'enum':
-			$qry.="`{$field['id']}` enum('".implode("','",array_map('mysqli_real_escape_string',$field['values']))."') DEFAULT NULL,";
+			function query_escape($str){
+				return mysqli_real_escape_string($db_conn,$db_conn, $str);
+			}
+			$qry.="`{$field['id']}` enum('".implode("','",array_map('query_escape',$field['values']))."') DEFAULT NULL,";
 			break;
 	}
 	$qry=rtrim($qry,',').") ENGINE=MyISAM DEFAULT CHARSET=utf8";
-	$res=mysqli_query($qry);
+	$res=mysqli_query($db_conn,$qry);
 	if ($res){
-		mysqli_query("UPDATE end_users SET credits = credits-1000 WHERE id = {$_SESSION['user']['org']} AND credits-reserve >999 LIMIT 1");
+		mysqli_query($db_conn,"UPDATE end_users SET credits = credits-1000 WHERE id = {$_SESSION['user']['org']} AND credits-reserve >999 LIMIT 1");
 		if (mysqli_affected_rows()){
 			$last=end($_SESSION['temp_path']);
 			
@@ -51,10 +54,10 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 			}
 			if(!$in_mail) $in_mail=$_SESSION['user']['email'];
 			
-			mysqli_query($qry="INSERT INTO forms_{$_SESSION['user']['org']} (name,tablename,node,public,fieldset,creator,mail) VALUES ('".
-			mysqli_real_escape_string($_SESSION['stored_form']['name'])."','$tbtime',".
+			mysqli_query($db_conn,$qry="INSERT INTO forms_{$_SESSION['user']['org']} (name,tablename,node,public,fieldset,creator,mail) VALUES ('".
+			mysqli_real_escape_string($db_conn,$_SESSION['stored_form']['name'])."','$tbtime',".
 			((isset($_POST['numbers']))?'NULL,1':$last['id'].',0').",'".
-			mysqli_real_escape_string($_SESSION['stored_form']['content'])."',{$_SESSION['user']['uid']},'".mysqli_real_escape_string($in_mail)."')");
+			mysqli_real_escape_string($db_conn,$_SESSION['stored_form']['content'])."',{$_SESSION['user']['uid']},'".mysqli_real_escape_string($db_conn,$in_mail)."')");
 			if ($id=mysqli_insert_id()){
 				if (isset($_POST['numbers'])) {
 					if ($id=mysqli_insert_id()){
@@ -84,9 +87,9 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 						if(isset($crit['sex'])) $options[]='gender = '.(($crit['sex']=='M')?1:0);
 						$tags=array('ed','job','kids');
 						for($i=0;$i<3;$i++) if(isset($crit[$tags[$i]])) for($j=0;$j<3;$j++) if(!in_array($j,$crit[$tags[$i]])) $options[]='NOT('.$tags[$i].' = '.$j.')';						
-						$res=mysqli_query('SELECT id,phone FROM visitors WHERE '.((empty($options))?1:implode(' AND ',$options)).' ORDER BY RAND() LIMIT 0,50');
+						$res=mysqli_query($db_conn,'SELECT id,phone FROM visitors WHERE '.((empty($options))?1:implode(' AND ',$options)).' ORDER BY RAND() LIMIT 0,50');
 						if($ln=mysqli_fetch_array($res)){
-							$res2=mysqli_query("SELECT (UNIX_TIMESTAMP(created) % 1000) AS secret FROM `forms_{$_SESSION['user']['org']}` WHERE id=$id");
+							$res2=mysqli_query($db_conn,"SELECT (UNIX_TIMESTAMP(created) % 1000) AS secret FROM `forms_{$_SESSION['user']['org']}` WHERE id=$id");
 							$l=mysqli_fetch_array($res2);
 							do {
 								sms(0,$ln['phone'],"New survey picked for you: {$_SESSION['stored_form']['name']} by {$_SESSION['user']['name']}. Use survey-code: {$_SESSION['user']['org']}.{$id}.".($l['secret']+$ln['id'])." to access it.");
@@ -111,7 +114,7 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 				}
 			} else $error="There was an error in creating the survey table";
 		} else {
-			mysqli_query("DROP TABLE `$tbname`");
+			mysqli_query($db_conn,"DROP TABLE `$tbname`");
 			if (!isset($alert)) $alert="Not enough credit!";
 		}
 	}else $alert="Unable to create form table. Please contact administrator.";

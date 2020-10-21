@@ -2,7 +2,7 @@
 include_once('../db.php');
 @session_start();
 if (isset($_GET['share'])){
-	$res=mysqli_query('SELECT * FROM share_form  WHERE id = '.(int)$_GET['share']);
+	$res=mysqli_query($db_conn,'SELECT * FROM share_form  WHERE id = '.(int)$_GET['share']);
 	if($line=mysqli_fetch_assoc($res)){
 		$tbl=$line['tbl'];
 		$org=$line['org'];
@@ -35,7 +35,7 @@ $Connect = @mysqli_connect($DB_Server, $DB_Username, $DB_Password) or die("Faile
 // Select database
 $Db = @mysqli_select_db($DB_DBName, $Connect) or die("Failed to select database:<br />" . mysqli_error(). "<br />" . mysqli_errno());
 // Execute query
-$result = @mysqli_query($sql,$Connect) or die("Failed to execute query:<br />" . mysqli_error(). "<br />" . mysqli_errno());
+$result = @mysqli_query($db_conn,$sql,$Connect) or die("Failed to execute query:<br />" . mysqli_error(). "<br />" . mysqli_errno());
  
 // Header info settings
 header("Content-Type: application/xls");

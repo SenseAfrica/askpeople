@@ -157,9 +157,9 @@
 			<a href="index.php"style="color:white!important"><button class="element image-button image-left place-right">
 				<?php
 				echo $_SESSION['user']['name'];
-				if ((isset($_POST['HWINPUTS-topup']))&&(is_numeric($_POST['HWINPUTS-topup']))&&($_POST['HWINPUTS-topup']>0)) mysqli_query('UPDATE end_users SET credits = credits+'.$_POST['HWINPUTS-topup'].' WHERE id='.$_SESSION['user']['org']);
+				if ((isset($_POST['HWINPUTS-topup']))&&(is_numeric($_POST['HWINPUTS-topup']))&&($_POST['HWINPUTS-topup']>0)) mysqli_query($db_conn,'UPDATE end_users SET credits = credits+'.$_POST['HWINPUTS-topup'].' WHERE id='.$_SESSION['user']['org']);
 				if($_SESSION['user']['admin']){
-					$res=mysqli_query('SELECT credits FROM end_users WHERE id='.$_SESSION['user']['org']);
+					$res=mysqli_query($db_conn,'SELECT credits FROM end_users WHERE id='.$_SESSION['user']['org']);
 					$line=mysqli_fetch_assoc($res);
 					echo ' : '.($_SESSION['user']['credits']=$line['credits']).' XOF';
 				}

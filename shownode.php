@@ -2,11 +2,11 @@
 function show_node($node,$last=false){
 //This function ensures that this node can be seen by uses through profiling
 	if((!$last)||($last['id']==$node)){
-		$res=mysqli_query("SELECT * FROM nodes_{$_SESSION['user']['org']} WHERE id = $node");
+		$res=mysqli_query($db_conn,"SELECT * FROM nodes_{$_SESSION['user']['org']} WHERE id = $node");
 		if($res)$last=mysqli_fetch_assoc($res);
 	}
 	if(!$last) return false;
-	$res=mysqli_query("SELECT * FROM profiling WHERE org = {$_SESSION['user']['org']} AND node = $node LIMIT 0,1");
+	$res=mysqli_query($db_conn,"SELECT * FROM profiling WHERE org = {$_SESSION['user']['org']} AND node = $node LIMIT 0,1");
 	if(mysqli_num_rows($res)) return true;
 	else {
 		//set up the db wrt the preferences
@@ -26,7 +26,7 @@ function show_node($node,$last=false){
 			}
 			else for($i=0;$i<3;$i++) $qry.=' AND '.$items[$j].'_'.$i.'=1';
 		}
-		$res=mysqli_query($qry);
+		$res=mysqli_query($db_conn,$qry);
 		if(mysqli_num_rows($res)){
 			$line=mysqli_fetch_assoc($res);
 			$profile=$line['id'];
@@ -34,11 +34,11 @@ function show_node($node,$last=false){
 			$qry="INSERT INTO profiles (min_age,max_age".((isset($crit['sex']))?',gender':'').((!empty($nulls))?','.implode(',',$nulls):'').") VALUES (".((isset($crit['age']))?str_replace('-',',',$crit['age']):'13,150').((isset($crit['sex']))?','.(($crit['sex']=='M')?'1':'0'):'');
 			for($i=0;$i<count($nulls);$i++) $qry.=',0';
 			$qry.=")";
-			mysqli_query($qry);
+			mysqli_query($db_conn,$qry);
 			$profile=mysqli_insert_id();
 		}
 		if ($profile){
-			$res=mysqli_query("INSERT INTO profiling (org,node,profile) VALUES ({$_SESSION['user']['org']},$node,$profile)");
+			$res=mysqli_query($db_conn,"INSERT INTO profiling (org,node,profile) VALUES ({$_SESSION['user']['org']},$node,$profile)");
 			if (!$res) $error ="There was an error when setting the target profile of your unit";
 			return true;
 		}
@@ -49,18 +49,18 @@ function check_node($node,$org=false){
 //this function checks if the given node still deserves profiling. it removes inactive branches
 	if($org){
 		//we cannot count on session, and $ode is in fact the form
-		$res=mysqli_query("SELECT node FROM forms_$org WHERE id=$node");
+		$res=mysqli_query($db_conn,"SELECT node FROM forms_$org WHERE id=$node");
 		$ln=mysqli_fetch_assoc($res);
 		$node=$ln['node'];
 	} else if(isset($_SESSION['user']['org'])) $org=$_SESSION['user']['org'];
 	else return;
-	$res=mysqli_query("SELECT id FROM forms_$org WHERE node=$node AND active = 1 LIMIT 0,1");
+	$res=mysqli_query($db_conn,"SELECT id FROM forms_$org WHERE node=$node AND active = 1 LIMIT 0,1");
 	if(!(mysqli_num_rows($res))){
-		$res=mysqli_query("SELECT profile FROM profiling WHERE org=$org AND node =$node");
+		$res=mysqli_query($db_conn,"SELECT profile FROM profiling WHERE org=$org AND node =$node");
 		$line=mysqli_fetch_assoc($res);
-		mysqli_query("DELETE FROM profiling WHERE org=$org AND node =$node");
-		$res=mysqli_query("SELECT org FROM profiling WHERE profile={$line['profile']} LIMIT 0,1");
-		if(!(mysqli_num_rows($res))) mysqli_query("DELETE FROM profiles WHERE id ={$line['profile']}");
+		mysqli_query($db_conn,"DELETE FROM profiling WHERE org=$org AND node =$node");
+		$res=mysqli_query($db_conn,"SELECT org FROM profiling WHERE profile={$line['profile']} LIMIT 0,1");
+		if(!(mysqli_num_rows($res))) mysqli_query($db_conn,"DELETE FROM profiles WHERE id ={$line['profile']}");
 	}
 }
 ?>

@@ -3,7 +3,7 @@ include_once('db.php');
 @session_start();
 $_SESSION['last_agent_id']= $in_id= (isset($_GET['id']))?$_GET['id']:((isset($_SESSION['last_agent_id']))?$_SESSION['last_agent_id']:false);
 
-if ((!is_numeric($in_id)) || ($in_id==$_SESSION['user']['uid']) || (!($res=mysqli_query("SELECT admin,email,realname,active,node FROM users WHERE uid = $in_id  AND org = {$_SESSION['user']['org']} LIMIT 0,1"))) || (!($agent=mysqli_fetch_assoc($res)))){
+if ((!is_numeric($in_id)) || ($in_id==$_SESSION['user']['uid']) || (!($res=mysqli_query($db_conn,"SELECT admin,email,realname,active,node FROM users WHERE uid = $in_id  AND org = {$_SESSION['user']['org']} LIMIT 0,1"))) || (!($agent=mysqli_fetch_assoc($res)))){
 	include ("head.php");
 	if($in_id==$_SESSION['user']['uid']) echo ("<br/><h2>You cannot edit your own account.</h2>");
 	else echo ("<br/><h2>Sorry, the agent requested does not exist.</h2>");
@@ -15,17 +15,17 @@ if ((!is_numeric($in_id)) || ($in_id==$_SESSION['user']['uid']) || (!($res=mysql
 if(isset($_POST['status'])){
 	if($_POST['target']!=$agent['node']) {
 		$_POST['target']=(int)$_POST['target'];
-		mysqli_query('UPDATE users SET node = '.$_POST['target'].' WHERE uid='.$in_id);
+		mysqli_query($db_conn,'UPDATE users SET node = '.$_POST['target'].' WHERE uid='.$in_id);
 		$agent['node']=$_POST['target'];
 	}
 	$_POST['status']=(int)$_POST['status'];
 	if($agent['active']!=$_POST['status']) {
-		mysqli_query('UPDATE users SET active = '.$_POST['status'].' WHERE id='.$in_id);
+		mysqli_query($db_conn,'UPDATE users SET active = '.$_POST['status'].' WHERE id='.$in_id);
 		$agent['active']=$_POST['status'];
 	}
 	$_POST['admin']=(int)$_POST['admin'];
 	if($agent['admin']!=$_POST['admin']) {
-		mysqli_query('UPDATE users SET admin = '.$_POST['admin'].' WHERE id='.$in_id);
+		mysqli_query($db_conn,'UPDATE users SET admin = '.$_POST['admin'].' WHERE id='.$in_id);
 		$agent['admin']=$_POST['admin'];
 	}
 	$success="Agent settings were updated.";
@@ -63,7 +63,7 @@ include ("head.php");
 		<div class="input-control select">
 			<select name="target">
 				<?php
-				$res=mysqli_query('SELECT id, name FROM nodes_'.$_SESSION['user']['org']);
+				$res=mysqli_query($db_conn,'SELECT id, name FROM nodes_'.$_SESSION['user']['org']);
 				while ($line=mysqli_fetch_assoc($res)) echo '<option '.(($line['id']==$agent['node'])?'selected="selected"':'').'value="'.$line['id'].'">'.$line['name'].'</option>';
 				?>
 			</select>

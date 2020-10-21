@@ -1,7 +1,7 @@
 <?php
 include('mail.php');
 include('db.php');
-$res=mysqli_query('SELECT email FROM users WHERE 1');
+$res=mysqli_query($db_conn,'SELECT email FROM users WHERE 1');
 while ($line=mysqli_fetch_assoc($res)){
 HW_send($line['email'],'Making the most of AskPeople',"
 <html><body>

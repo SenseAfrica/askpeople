@@ -8,7 +8,7 @@ if(isset($_POST['HWINPUTS-submit'])){
 		$fh = fopen('http://www.easycaptchas.com/check.aspx?sessionid='.session_id().'.'.$_SESSION['captchas'].'.askpeople.info&input='.$_POST['captcha'], 'r');
 		$result = trim(fread($fh,8192));
 		if ($result == 'TRUE') {
-			mysqli_query('INSERT INTO visitors (step,birth,gender,ed,job,kids) VALUES (5,'.(int)$_POST['HWINPUTS-birth'].','.(int)$_POST['HWINPUTS-gender'].','.(int)$_POST['HWINPUTS-ed'].','.(int)$_POST['HWINPUTS-job'].','.(int)$_POST['HWINPUTS-kids'].')');
+			mysqli_query($db_conn,'INSERT INTO visitors (step,birth,gender,ed,job,kids) VALUES (5,'.(int)$_POST['HWINPUTS-birth'].','.(int)$_POST['HWINPUTS-gender'].','.(int)$_POST['HWINPUTS-ed'].','.(int)$_POST['HWINPUTS-job'].','.(int)$_POST['HWINPUTS-kids'].')');
 			if ($id=mysqli_insert_id()) $_SESSION['submitter_id']=(int)$id;
 			else $alert="Something went wrong (database error). Try again later.";
 		}
@@ -35,7 +35,7 @@ if ((isset($_SESSION['answered']))&&(in_array($_GET['go'],$_SESSION['answered'])
 	include ("foot.php");
 	exit;
 }
-if ((!isset($_GET['go'])) || (count($tmp=explode('.',$_GET['go']))<2) || (!is_numeric($tmp[0]))|| (!is_numeric($tmp[1])) || (!($res=mysqli_query("SELECT fieldset,name,mail FROM forms_{$tmp[0]} WHERE id = {$tmp[1]} AND public =1 AND active = 1"))) || (!($form=mysqli_fetch_assoc($res)))){
+if ((!isset($_GET['go'])) || (count($tmp=explode('.',$_GET['go']))<2) || (!is_numeric($tmp[0]))|| (!is_numeric($tmp[1])) || (!($res=mysqli_query($db_conn,"SELECT fieldset,name,mail FROM forms_{$tmp[0]} WHERE id = {$tmp[1]} AND public =1 AND active = 1"))) || (!($form=mysqli_fetch_assoc($res)))){
 	include ("head.php");
 	echo ("<br/><h2>Sorry, the form requested does not exist, or is restricted or inactive.</h2>");
 	include ("foot.php");

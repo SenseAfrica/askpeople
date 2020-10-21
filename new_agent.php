@@ -6,12 +6,12 @@ if ((isset($_GET['cancel']))&&(empty($_POST))) unset($_SESSION['stored_form'],$_
 if ((isset($_GET['insert']))&&(isset($_SESSION['stored_form']))&&($_SESSION['page']=='new_agent')) {
 	if (filter_var($_SESSION['stored_form']['email'],FILTER_VALIDATE_EMAIL)) {
 		//prepare the data
-		$_SESSION['stored_form']['email']=mysqli_real_escape_string($mail=$_SESSION['stored_form']['email']);
+		$_SESSION['stored_form']['email']=mysqli_real_escape_string($db_conn,$mail=$_SESSION['stored_form']['email']);
 		$_SESSION['stored_form']['password']= md5(($pass= ($_SESSION['stored_form']['password']=='')? str_pad(((mt_rand(123456,999999)).''),6,'0',STR_PAD_LEFT):$_SESSION['stored_form']['password']).'no-paps');
-		$_SESSION['stored_form']['realname']=mysqli_real_escape_string($uname=$_SESSION['stored_form']['realname']);
+		$_SESSION['stored_form']['realname']=mysqli_real_escape_string($db_conn,$uname=$_SESSION['stored_form']['realname']);
 		//insert data
 		$last = end($_SESSION['temp_path']);
-		$res = mysqli_query($qry="INSERT INTO users (password,admin,org,email,realname,node) VALUES ('{$_SESSION['stored_form']['password']}',".((isset($_GET['admin']))?1:0).",{$_SESSION['user']['org']},'{$_SESSION['stored_form']['email']}','{$_SESSION['stored_form']['realname']}',{$last['id']})");
+		$res = mysqli_query($db_conn,$qry="INSERT INTO users (password,admin,org,email,realname,node) VALUES ('{$_SESSION['stored_form']['password']}',".((isset($_GET['admin']))?1:0).",{$_SESSION['user']['org']},'{$_SESSION['stored_form']['email']}','{$_SESSION['stored_form']['realname']}',{$last['id']})");
 		//echo $qry;
 		if (($res)&&(mysqli_affected_rows())){
 			//send the mail (using: uname mail pass)
