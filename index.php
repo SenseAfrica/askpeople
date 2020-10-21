@@ -27,7 +27,7 @@ if (isset($_SESSION['user'])){
 		if ($_POST['new_pwd']==$_POST['new_pwd_2']){
 			if(md5($_POST['old_pwd'].'no-paps')==$_SESSION['user']['password']){
 				$res=mysqli_query($db_conn,'UPDATE users SET password = "'.md5($_POST['new_pwd'].'no-paps').'" WHERE uid = '.$_SESSION['user']['uid']);
-				if (($res)&&(mysqli_affected_rows())){
+				if (($res)&&(mysqli_affected_rows($db_conn))){
 					$_SESSION['user']['password']=md5($_POST['new_pwd'].'no-paps');
 					$success="Password Successfuly Updated";
 				}

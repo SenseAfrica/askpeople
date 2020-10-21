@@ -14,12 +14,12 @@ if (mysqli_num_rows($res)){
 			$needed=10*substr_count($line['fieldset'],'</li>');
 			if($undo) {
 				mysqli_query($db_conn,"DELETE FROM reservations WHERE org=$org AND form=$form AND visitor={$line['id']}");
-				if(mysqli_affected_rows()) mysqli_query($db_conn,"UPDATE end_users SET reserve = reserve-$needed WHERE id=org");
+				if(mysqli_affected_rows($db_conn)) mysqli_query($db_conn,"UPDATE end_users SET reserve = reserve-$needed WHERE id=org");
 			} else {
 				mysqli_query($db_conn,"INSERT INTO reservations VALUES ($org,$form,{$line['id']})");
-				if(mysqli_affected_rows()) mysqli_query($db_conn,"UPDATE end_users SET reserve = reserve+$needed WHERE id=org AND credits>=(reserve + $needed)");
+				if(mysqli_affected_rows($db_conn)) mysqli_query($db_conn,"UPDATE end_users SET reserve = reserve+$needed WHERE id=org AND credits>=(reserve + $needed)");
 			}
-			return mysqli_affected_rows();
+			return mysqli_affected_rows($db_conn);
 		}
 		return false;
 	}

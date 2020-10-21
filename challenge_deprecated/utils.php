@@ -16,7 +16,7 @@ function sms($org,$phone,$msg,$dr=0,$todo=false){
 	}
 	//$org=0 means SEND FOR FREE
 	if ($org) mysqli_query($db_conn,"UPDATE end_users SET credits = credits - 10 WHERE id=$org AND (credits-reserve)>9");
-	if ((!$org)||(mysqli_affected_rows())){
+	if ((!$org)||(mysqli_affected_rows($db_conn))){
 		$res = sendSMS($phone, $msg, 'AskPeople', $dr, $token);
 		return (floor((int)$res[0]/100)==2);	
 	}

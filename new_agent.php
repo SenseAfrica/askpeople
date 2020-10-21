@@ -13,7 +13,7 @@ if ((isset($_GET['insert']))&&(isset($_SESSION['stored_form']))&&($_SESSION['pag
 		$last = end($_SESSION['temp_path']);
 		$res = mysqli_query($db_conn,$qry="INSERT INTO users (password,admin,org,email,realname,node) VALUES ('{$_SESSION['stored_form']['password']}',".((isset($_GET['admin']))?1:0).",{$_SESSION['user']['org']},'{$_SESSION['stored_form']['email']}','{$_SESSION['stored_form']['realname']}',{$last['id']})");
 		//echo $qry;
-		if (($res)&&(mysqli_affected_rows())){
+		if (($res)&&(mysqli_affected_rows($db_conn))){
 			//send the mail (using: uname mail pass)
 			$msg=
 "<html>

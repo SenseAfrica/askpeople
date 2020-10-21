@@ -39,7 +39,7 @@ if (isset($_POST['new_node'])) {
 		else if (isset($criteria[$item])) $new_crit[$item]=$criteria[$item];
 	}
 	$res=mysqli_query($db_conn,"INSERT INTO nodes_{$_SESSION['user']['org']} (parent,name,criteria) VALUES ($node,'".mysqli_real_escape_string($db_conn,ucwords(strtolower($_POST['new_node'])))."','".json_encode($new_crit)."')");
-	if (($res)&&(mysqli_affected_rows())) {
+	if (($res)&&(mysqli_affected_rows($db_conn))) {
 		$success = "\"{$_POST['new_node']}\" sub-unit was created";
 	}
 	else $alert="Database Error. Please Try Again Later.";

@@ -33,7 +33,7 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 			break;
 		case 'enum':
 			function query_escape($str){
-				return mysqli_real_escape_string($db_conn,$db_conn, $str);
+				return mysqli_real_escape_string($db_conn, $str);
 			}
 			$qry.="`{$field['id']}` enum('".implode("','",array_map('query_escape',$field['values']))."') DEFAULT NULL,";
 			break;
@@ -42,7 +42,7 @@ if (((isset($_GET['insert']))||(isset($_POST['numbers'])))&&(isset($_SESSION['st
 	$res=mysqli_query($db_conn,$qry);
 	if ($res){
 		mysqli_query($db_conn,"UPDATE end_users SET credits = credits-1000 WHERE id = {$_SESSION['user']['org']} AND credits-reserve >999 LIMIT 1");
-		if (mysqli_affected_rows()){
+		if (mysqli_affected_rows($db_conn)){
 			$last=end($_SESSION['temp_path']);
 			
 			$in_mail=false;

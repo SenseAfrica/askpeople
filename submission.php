@@ -13,7 +13,7 @@ function submit_survey($visitor,$obj,$org,$form,$form_title='',$admin_mail=false
 	$line2=mysqli_fetch_assoc($res);
 	$res=mysqli_query($db_conn,'INSERT INTO form_'.$org.'_'.$line2['tablename'].' ('.implode(',',$keys).') VALUES ('.implode(',',$values).')');
 	//echo 'INSERT INTO form_'.$org.'_'.$line2['tablename'].' ('.implode(',',$keys).') VALUES ('.implode(',',$values).')'.'<br/>';
-	if(($res)&&(mysqli_affected_rows())){
+	if(($res)&&(mysqli_affected_rows($db_conn))){
 		$id=mysqli_insert_id();
 		mysqli_query($db_conn,"INSERT INTO submissions_$org (agent,form,row_id) VALUES ($visitor,$form,$id)");
 		//echo "INSERT INTO submissions_$org (agent,form,row_id) VALUES ($visitor,$form,$id)";
@@ -21,9 +21,9 @@ function submit_survey($visitor,$obj,$org,$form,$form_title='',$admin_mail=false
 		$hr=floor(time()/(60 * 60));
 		$nd=1;
 		mysqli_query($db_conn,$qry="UPDATE stats_$org SET count = count +1 WHERE form = $form AND node = $nd AND hour = $hr LIMIT 1");
-		if (!mysqli_affected_rows()){
+		if (!mysqli_affected_rows($db_conn)){
 			mysqli_query($db_conn,"INSERT INTO stats_$org (form,node,hour,count,node_name) VALUES ($form,$nd,$hr,1,'[All submissions]"./*mysqli_real_escape_string($db_conn,$nd_nm).*/"')");
-			if (!mysqli_affected_rows()) mysqli_query($db_conn,$qry);
+			if (!mysqli_affected_rows($db_conn)) mysqli_query($db_conn,$qry);
 		}
 		
 		//handle deactivating and alerting of submissions

@@ -108,14 +108,14 @@ if (isset($_GET["response"])) {
 				$num=count($obj);
 				$needed=10*$num;
 				mysqli_query($db_conn,"DELETE FROM reservations WHERE org={$line['org']} AND form={$line['form']} AND visitor={$line['id']}");
-				if(mysqli_affected_rows()) mysqli_query($db_conn,"UPDATE end_users SET reserve = reserve-$needed, credits=credits-$needed WHERE id={$line['org']} AND credits>=$needed");
+				if(mysqli_affected_rows($db_conn)) mysqli_query($db_conn,"UPDATE end_users SET reserve = reserve-$needed, credits=credits-$needed WHERE id={$line['org']} AND credits>=$needed");
 				file_put_contents('debug.txt',"UPDATE end_users SET reserve = reserve-$needed, credits=credits-$needed WHERE id={$line['org']} AND credits>=$needed");
 				
 				include_once('../../submission.php');
 				if(isset($admin)) submit_survey($line['id'],$obj,$line['org'],$line['form'],$admin[0],$admin[1]);
 				else submit_survey($line['id'],$obj,$line['org'],$line['form']);
 					
-				if(mysqli_affected_rows()) {
+				if(mysqli_affected_rows($db_conn)) {
 					mysqli_query($db_conn,"UPDATE visitors SET org = 0, form = 0, step = 5, credits = credits + ($num*5) WHERE id = {$line['id']}");
 					//include_once('../../submission.php');
 					//if(isset($admin)) submit_survey($line['id'],$obj,$line['org'],$line['form'],$admin[0],$admin[1]);
