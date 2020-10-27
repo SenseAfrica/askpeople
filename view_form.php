@@ -6,21 +6,23 @@ $_SESSION['last_form_id']= $in_id= (isset($_GET['id']))?$_GET['id']:((isset($_SE
 
 if ((is_numeric($in_id)) && ($res=mysqli_query($db_conn,"SELECT deactivator, alerter, phone,public, forms_{$_SESSION['user']['org']}.name, tablename,mail, forms_{$_SESSION['user']['org']}.node, forms_{$_SESSION['user']['org']}.active, fieldset, forms_{$_SESSION['user']['org']}.created, realname, submissions FROM forms_{$_SESSION['user']['org']}, users, form_view_{$_SESSION['user']['org']} WHERE forms_{$_SESSION['user']['org']}.id = {$in_id} AND creator = uid AND forms_{$_SESSION['user']['org']}.id=form_view_{$_SESSION['user']['org']}.id LIMIT 0,1")) && ($form=mysqli_fetch_assoc($res))){
 	$tbname='form_'.$_SESSION['user']['org'].'_'.$form['tablename'];
-	if ($res=mysqli_list_fields ($sql_details['db'],$tbname)){
-		$_SESSION['formFields']=array();
-		$i=0;
-		$_SESSION['formId']=$form['tablename'];
-		while (@$field=mysqli_field_name($res,$i)){
-			$i++;
-			if ($field=='submit_node') $_SESSION['formFields'][]='sub-unit';
-			else if (($field!='submit_id')&&($field!='submit_location')) $_SESSION['formFields'][]=$field;
-		}
-	} else {
-		include ("head.php");
+
+	$result = mysqli_query($db_conn,"SHOW COLUMNS FROM $tbname");
+    if (!$result) {
+        include ("head.php");
 		echo ("<br/><h2>Sorry, a database error occured.</h2>");
 		include ("foot.php");
 		exit;
-	}
+    }
+    if (mysqli_num_rows($result) > 0) {
+        $_SESSION['formFields']=array();
+		$_SESSION['formId']=$form['tablename'];
+        while ($row = mysqli_fetch_row($result)) {
+            $field=$row[0];
+            if ($field=='submit_node') $_SESSION['formFields'][]='sub-unit';
+			else if (($field!='submit_id')&&($field!='submit_location')) $_SESSION['formFields'][]=$field;
+        }
+    }
 } else {
 	include ("head.php");
 	echo ("<br/><h2>Sorry, the form requested does not exist.</h2>");
